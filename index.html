@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpendWise - Smart Budget Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>💰 SpendWise</h1>
+    <p class="tagline">Track your budget. Spend wisely.</p>
+  </header>
+
+  <main class="app-main">
+    <section class="card">
+      <h2>Get Started</h2>
+      <p>
+        Click the button below to enter your monthly budget and expenses.
+        SpendWise will calculate your remaining balance and show a full
+        breakdown in your browser console.
+      </p>
+      <button id="startBtn" class="primary-btn">Start Budgeting</button>
+    </section>
+
+    <section class="card" id="resultsCard" hidden>
+      <h2>Your Budget Summary</h2>
+      <p>Open your browser console (F12 → Console tab) to see the full
+        detailed breakdown of your budget calculations.</p>
+      <div id="summaryOutput" class="summary-output"></div>
+    </section>
+
+    <section class="card info-card">
+      <h2>How it works</h2>
+      <ol>
+        <li>You'll be prompted to enter your total monthly income/budget.</li>
+        <li>You'll then enter several expenses one at a time.</li>
+        <li>SpendWise calculates your total spending and remaining balance.</li>
+        <li>Results are logged clearly to the console and shown on screen.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 SpendWise. Built for learning JavaScript fundamentals.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #f4f9f6, #e3f0ea);
+  color: #1f2d27;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-header {
+  text-align: center;
+  padding: 40px 20px 20px;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  color: #1b6b4a;
+}
+
+.tagline {
+  color: #4a6157;
+  margin-top: 6px;
+  font-size: 1.05rem;
+}
+
+.app-main {
+  width: 100%;
+  max-width: 640px;
+  padding: 0 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 14px rgba(27, 107, 74, 0.12);
+}
+
+.card h2 {
+  color: #1b6b4a;
+  margin-bottom: 10px;
+}
+
+.card p {
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.card ol {
+  padding-left: 20px;
+  line-height: 1.7;
+}
+
+.primary-btn {
+  background: #1b6b4a;
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.primary-btn:hover {
+  background: #145238;
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
+}
+
+.summary-output {
+  background: #f0f7f3;
+  border-left: 4px solid #1b6b4a;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 0.98rem;
+  white-space: pre-line;
+}
+
+.info-card {
+  background: #fbfdfc;
+  border: 1px dashed #b9d8c8;
+}
+
+.app-footer {
+  padding: 20px;
+  color: #6b8478;
+  font-size: 0.85rem;
+  text-align: center;
+}
