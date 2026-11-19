@@ -1,164 +1,88 @@
-/* =========================================================
-   SPENDWISE - JavaScript Foundation
-   This file handles data storage, user input, calculations,
-   and displaying results for the SpendWise budgeting app.
-   ========================================================= */
+const expenses = [];
+const $ = (id) => document.getElementById(id);
+const money = (n) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// ---------------------------------------------------------
-// 1. APPLICATION DATA (variables & data types)
-// ---------------------------------------------------------
+function totals() {
+  const budget = parseFloat($("budget").value) || 0;
+  const spent = expenses.reduce((sum, e) => sum + e.amount, 0);
+  return { budget, spent, remaining: budget - spent };
+}
 
-// Budget-related data
-let monthlyBudget = 0;        // Number: total money available for the month
-let userName = "";            // String: name of the user (optional, for personalization)
-
-// Expense-related data
-let expenseNames = [];        // Array of strings: labels for each expense
-let expenseAmounts = [];      // Array of numbers: amount for each expense
-let totalExpenses = 0;        // Number: running total of all expenses
-let remainingBalance = 0;     // Number: budget left after expenses
-
-// Constant that controls how many expenses we ask the user for
-const NUMBER_OF_EXPENSES = 3;
-
-
-// ---------------------------------------------------------
-// 2. FUNCTIONS (reusable logic)
-// ---------------------------------------------------------
-
-/**
- * Collects the user's name and total monthly budget using prompts.
- * Stores the values in the shared variables above.
- */
-function getBudgetInput() {
-  userName = prompt("What is your name?", "Guest");
-
-  // parseFloat() converts the text from the prompt into a number
-  let budgetInput = prompt("Enter your total monthly budget ($):", "1000");
-  monthlyBudget = parseFloat(budgetInput);
-
-  // Basic validation: if the user enters something invalid, default to 0
-  if (isNaN(monthlyBudget) || monthlyBudget < 0) {
-    monthlyBudget = 0;
+function renderList() {
+  const list = $("expense-list");
+  list.innerHTML = "";
+  if (expenses.length === 0) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "No expenses yet. Add your first one below.";
+    list.appendChild(li);
+    return;
   }
+  expenses.forEach((e, i) => {
+    const li = document.createElement("li");
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = e.label;
+    const amt = document.createElement("span");
+    amt.className = "amt";
+    amt.textContent = money(e.amount);
+    const rm = document.createElement("button");
+    rm.className = "remove";
+    rm.type = "button";
+    rm.setAttribute("aria-label", "Remove " + e.label);
+    rm.textContent = "\u00d7";
+    rm.addEventListener("click", () => { expenses.splice(i, 1); update(); });
+    li.append(name, amt, rm);
+    list.appendChild(li);
+  });
 }
 
-/**
- * Collects a fixed number of expenses from the user (name + amount)
- * and stores them in the expenseNames and expenseAmounts arrays.
- */
-function getExpenseInput() {
-  for (let i = 1; i <= NUMBER_OF_EXPENSES; i++) {
-    let name = prompt("Enter a name for expense #" + i + ":", "Expense " + i);
-    let amountInput = prompt("Enter the amount for '" + name + "' ($):", "0");
-    let amount = parseFloat(amountInput);
+function renderSummary() {
+  const { budget, spent, remaining } = totals();
+  const over = remaining < 0;
+  $("who").textContent = $("name").value.trim() || "Guest";
+  $("remaining").textContent = (over ? "-" : "") + money(Math.abs(remaining));
+  $("remaining").classList.toggle("over", over);
+  $("out-budget").textContent = money(budget);
+  $("out-expenses").textContent = money(spent);
+  $("out-count").textContent = expenses.length;
 
-    if (isNaN(amount) || amount < 0) {
-      amount = 0;
-    }
+  const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
+  const fill = $("meter-fill");
+  fill.style.width = pct + "%";
+  fill.classList.toggle("over", over);
 
-    expenseNames.push(name);
-    expenseAmounts.push(amount);
-  }
+  if (budget <= 0) $("meter-note").textContent = "Enter your budget to begin.";
+  else if (over) $("meter-note").textContent = "You are " + money(-remaining) + " over budget.";
+  else $("meter-note").textContent = Math.round(pct) + "% of your budget is spent.";
 }
 
-/**
- * Calculates the total of all expenses stored in expenseAmounts.
- * @returns {number} the sum of all expenses
- */
-function calculateTotalExpenses() {
-  let sum = 0;
-  for (let i = 0; i < expenseAmounts.length; i++) {
-    sum += expenseAmounts[i];
-  }
-  return sum;
+function update() { renderList(); renderSummary(); }
+
+function logSummary() {
+  const { budget, spent, remaining } = totals();
+  console.log("----- SpendWise Budget Summary -----");
+  console.log("User: " + ($("name").value.trim() || "Guest"));
+  console.log("Monthly Budget: " + money(budget));
+  expenses.forEach((e, i) => console.log((i + 1) + ". " + e.label + ": " + money(e.amount)));
+  console.log("Total Expenses: " + money(spent));
+  console.log("Remaining Balance: " + money(remaining));
+  console.log(remaining < 0 ? "Warning: you are over budget." : "You are within budget.");
 }
 
-/**
- * Calculates the remaining balance based on the monthly budget
- * and the total expenses.
- * @param {number} budget - the total monthly budget
- * @param {number} expenses - the total of all expenses
- * @returns {number} the remaining balance (can be negative if overspent)
- */
-function calculateRemainingBalance(budget, expenses) {
-  return budget - expenses;
-}
+$("expense-form").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const label = $("exp-label").value.trim();
+  const amount = parseFloat($("exp-amount").value);
+  if (!label || isNaN(amount) || amount < 0) return;
+  expenses.push({ label, amount });
+  $("exp-label").value = "";
+  $("exp-amount").value = "";
+  $("exp-label").focus();
+  update();
+});
+$("budget").addEventListener("input", renderSummary);
+$("name").addEventListener("input", renderSummary);
+$("console-btn").addEventListener("click", logSummary);
 
-/**
- * Builds a readable, labeled summary string of the whole budget,
- * used for both the console output and the on-screen display.
- * @returns {string} formatted summary text
- */
-function buildSummaryText() {
-  let summary = "----- SpendWise Budget Summary -----\n";
-  summary += "User: " + userName + "\n";
-  summary += "Monthly Budget: $" + monthlyBudget.toFixed(2) + "\n";
-  summary += "\nExpenses:\n";
-
-  for (let i = 0; i < expenseNames.length; i++) {
-    summary += "  - " + expenseNames[i] + ": $" + expenseAmounts[i].toFixed(2) + "\n";
-  }
-
-  summary += "\nTotal Expenses: $" + totalExpenses.toFixed(2) + "\n";
-  summary += "Remaining Balance: $" + remainingBalance.toFixed(2) + "\n";
-
-  if (remainingBalance < 0) {
-    summary += "\nWarning: You have exceeded your monthly budget!";
-  } else {
-    summary += "\nNice! You are within your monthly budget.";
-  }
-
-  return summary;
-}
-
-/**
- * Logs a clearly labeled breakdown of the budget to the console.
- */
-function displayResultsInConsole() {
-  console.log("=== SpendWise Console Report ===");
-  console.log("User Name:", userName);
-  console.log("Monthly Budget:", monthlyBudget);
-  console.log("Expense Names:", expenseNames);
-  console.log("Expense Amounts:", expenseAmounts);
-  console.log("Total Expenses:", totalExpenses);
-  console.log("Remaining Balance:", remainingBalance);
-  console.log(buildSummaryText());
-}
-
-/**
- * Displays the budget summary on the webpage itself.
- */
-function displayResultsOnPage() {
-  const resultsCard = document.getElementById("resultsCard");
-  const summaryOutput = document.getElementById("summaryOutput");
-
-  summaryOutput.textContent = buildSummaryText();
-  resultsCard.hidden = false;
-}
-
-/**
- * Main function that runs the whole SpendWise data flow:
- * collects input, performs calculations, and displays results.
- */
-function runSpendWise() {
-  getBudgetInput();
-  getExpenseInput();
-
-  totalExpenses = calculateTotalExpenses();
-  remainingBalance = calculateRemainingBalance(monthlyBudget, totalExpenses);
-
-  displayResultsInConsole();
-  displayResultsOnPage();
-}
-
-
-// ---------------------------------------------------------
-// 3. EVENT LISTENERS (connecting logic to the page)
-// ---------------------------------------------------------
-
-const startBtn = document.getElementById("startBtn");
-startBtn.addEventListener("click", runSpendWise);
-
-// Confirms the script has loaded successfully
-console.log("SpendWise script.js loaded successfully.");
+update();

@@ -1,50 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpendWise - Smart Budget Tracker</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SpendWise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <header class="app-header">
-    <h1>💰 SpendWise</h1>
-   <p class="tagline">Track your budget. Spend wisely. Auto deploy works!</p>
+  <header class="top">
+    <h1>SpendWise</h1>
+    <p id="tagline">Track your budget. Spend wisely. Auto deploy works!</p>
   </header>
 
-  <main class="app-main">
-    <section class="card">
-      <h2>Get Started</h2>
-      <p>
-        Click the button below to enter your monthly budget and expenses.
-        SpendWise will calculate your remaining balance and show a full
-        breakdown in your browser console.
-      </p>
-      <button id="startBtn" class="primary-btn">Start Budgeting</button>
+  <main class="layout">
+    <section class="panel entry" aria-labelledby="entry-title">
+      <h2 id="entry-title">Your month</h2>
+
+      <label for="name">Your name</label>
+      <input id="name" type="text" placeholder="Guest" autocomplete="name">
+
+      <label for="budget">Monthly budget ($)</label>
+      <input id="budget" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+
+      <h3>Expenses</h3>
+      <ul id="expense-list" class="expenses"></ul>
+
+      <form id="expense-form" class="add-row">
+        <input id="exp-label" type="text" placeholder="Rent, food, transport…" aria-label="Expense name" required>
+        <input id="exp-amount" type="number" min="0" step="0.01" placeholder="0.00" aria-label="Expense amount" inputmode="decimal" required>
+        <button type="submit" class="btn">Add expense</button>
+      </form>
     </section>
 
-    <section class="card" id="resultsCard" hidden>
-      <h2>Your Budget Summary</h2>
-      <p>Open your browser console (F12 → Console tab) to see the full
-        detailed breakdown of your budget calculations.</p>
-      <div id="summaryOutput" class="summary-output"></div>
-    </section>
+    <section class="panel summary" aria-labelledby="sum-title" aria-live="polite">
+      <h2 id="sum-title">Your budget summary</h2>
+      <p class="who" id="who">Guest</p>
 
-    <section class="card info-card">
-      <h2>How it works</h2>
-      <ol>
-        <li>You'll be prompted to enter your total monthly income/budget.</li>
-        <li>You'll then enter several expenses one at a time.</li>
-        <li>SpendWise calculates your total spending and remaining balance.</li>
-        <li>Results are logged clearly to the console and shown on screen.</li>
-      </ol>
+      <p class="remaining-label">Remaining</p>
+      <p class="remaining" id="remaining">$0.00</p>
+
+      <div class="meter" role="img" aria-label="Share of budget spent">
+        <div class="meter-fill" id="meter-fill"></div>
+      </div>
+      <p class="meter-note" id="meter-note">Enter your budget to begin.</p>
+
+      <dl class="figures">
+        <div><dt>Monthly budget</dt><dd id="out-budget">$0.00</dd></div>
+        <div><dt>Total expenses</dt><dd id="out-expenses">$0.00</dd></div>
+        <div><dt>Number of expenses</dt><dd id="out-count">0</dd></div>
+      </dl>
+
+      <button id="console-btn" class="btn btn-light" type="button">Print full breakdown to console</button>
     </section>
   </main>
-
-  <footer class="app-footer">
-    <p>&copy; 2026 SpendWise. Built for learning JavaScript fundamentals.</p>
-  </footer>
 
   <script src="script.js"></script>
 </body>
